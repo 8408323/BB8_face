@@ -1,24 +1,27 @@
 from tkinter import *
+import numpy
 
 # Global variables
-width = 200
-height = 200
+width = 800
+height = 480
+numpy.zeros((8, 8))
 
 # Functions
-def fullEyes(int x_dots, int y_dots, int spacing):
-	x_eyes = [None]*x_dots
-	x_eyes[0] = (width-spacing)/x_dots
-	for i in range(x_dots-1):
-		if(x_eyes[i]>width-1.5*x_eyes[0])
-			break
-		x_eyes[i+1] = 1.5*x_eyes[0]+x_eyes[i] 
-	return eyes
+def fullEyes(color):
+        array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
+        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
+        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
+        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
+        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]])
+        c.create_rectangle(25,67.5,55,97.5, fill=color)
 	
 # Program
 master = Tk()
+# fullEyes(16,8,15)
 
 c = Canvas(master, bg="black", width=width, height=height)
 c.pack()
-c.create_rectangle(fullEyes(), fill="red")
+#c.create_rectangle(fullEyes(16,8,15), fill="red")
+fullEyes("red")
 
 mainloop()
