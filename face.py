@@ -1,6 +1,8 @@
 import wx
 from array import array
 import numpy as np
+import random
+import time
 
 coords =  np.zeros((2,8,16))
 for x in range(0,8):
@@ -90,21 +92,29 @@ def expressions(expr):
 
 class MyPanel(wx.Panel):
  
-    def __init__(self, parent, exp, color):
+    def __init__(self, parent):
         """Constructor"""
         wx.Panel.__init__(self, parent)
  
         self.Bind(wx.EVT_KEY_DOWN, self.onKey)
-        self.Bind(wx.EVT_PAINT, self.OnPaint)
-        self.SetBackgroundColour("black")
-        self.exp = exp
-        print(exp)
-        print(color)
+        self.timer = wx.Timer(self, wx.ID_ANY)
+        self.Bind(wx.EVT_TIMER, self.OnTimer)
+        self.SetBackgroundColour("black")  
+    
+        self.timer.Start(random.random() * 10000)
+        self.color = 0
+        self.exp = 0
+        self.expList = ['full', 'angry', 'left', 'right', 'blink_right', 'blink_left', 'small_heart', 'heart']
  
+    def OnTimer(self, event):
+        """ OnTimer event which is run at a random interval, which runs OnPaint method. """
+        self.exp = self.expList[random.randint(0, len(self.expList)-1)]
+        self.color = (random.randint(0, 255),random.randint(0, 255),random.randint(0, 255))
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Refresh()
+
     def onKey(self, event):
-        """
-        Check for ESC key press and exit if ESC is pressed
-        """
+        """ Check for ESC key press and exit if ESC is pressed """
         key_code = event.GetKeyCode()
         if key_code == wx.WXK_ESCAPE:
             self.GetParent().Close()
@@ -113,27 +123,25 @@ class MyPanel(wx.Panel):
     
     def OnPaint(self, evt):
         """set up the device context (DC) for painting"""
-        dc = wx.PaintDC(self)
         expr = expressions(self.exp)
-        dc.SetBrush(wx.Brush(wx.Colour(color), wx.SOLID))
+        dc = wx.PaintDC(self)
+        dc.SetBrush(wx.Brush(wx.Colour(self.color), wx.SOLID))
         for i in range(0,8):
             for j in range(0,16):
                 if expr[0,i,j] != 0:
-#                     print(expr[0,i,j], expr[1,i,j], expr[0,i,j]+30, expr[1,i,j]+30)                    
+#                     Todo: Replace DrawRectanlge with DrawRectangleList(self, rectangles, pens=None, brushes=None)
                     dc.DrawRectangle(expr[0,i,j], expr[1,i,j], 30, 30)
         
 class MyFrame(wx.Frame):
     """Used for setting mode to fullscreen"""
  
-    def __init__(self, exp, color):
+    def __init__(self):
         """Constructor"""
         wx.Frame.__init__(self, None, title="Robot demo, fullscreen")
-        panel = MyPanel(self, exp, color)
+        panel = MyPanel(self)
         self.ShowFullScreen(True)
  
 if __name__ == "__main__":
     app = wx.App(False)
-    color = (255,127,127)
-    exp = 'heart'
-    frame = MyFrame(exp, color)
+    frame = MyFrame()
     app.MainLoop()
