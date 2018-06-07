@@ -116,7 +116,8 @@ class MyPanel(wx.Panel):
         self.db_id = 0
         self.text = ''     
         
-        self.timer.Start(4000 + random.random() * 600)
+        self.timer.Start(4000 + random.random() * 6000)
+        
         
     def OnTimer(self, event):
         """ OnTimer event which is run at a random interval, which runs OnPaint method. """
