@@ -118,7 +118,6 @@ class MyPanel(wx.Panel):
         
         self.timer.Start(4000 + random.random() * 6000)
         
-        
     def OnTimer(self, event):
         """ OnTimer event which is run at a random interval, which runs OnPaint method. """
         
@@ -142,7 +141,7 @@ class MyPanel(wx.Panel):
             self.color = (random.randint(0, 255),random.randint(0, 255),random.randint(0, 255))
             self.Bind(wx.EVT_PAINT, self.OnPaint)
         
-        if random.randint(1,5) == 1:
+        if random.randint(1,4) == 1:
             file = str(random.randint(1, 57))
             formatType = '.wav'
             filename = self.path + file + formatType
