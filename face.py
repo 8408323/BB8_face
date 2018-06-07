@@ -4,6 +4,7 @@ from array import array
 import numpy as np
 import random
 import time
+import pygame
 import pymysql
 pymysql.install_as_MySQLdb()
 import MySQLdb
@@ -55,7 +56,7 @@ def expressions(expr):
     elif expr == 'blink_right':
         expr_1 = np.array(
         [[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,      0.,  0.,  1.,  1.,  1.,  1.,  0.,  0.],
-         [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,      0.,  1.,  1.,  1.,  1.,  1.,  1.,  1.],
+         [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,      0.,  1.,  1.,  1.,  1.,  1.,  1.,  0.],
          [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,      1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.],
          [ 1.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,      1.,  1.,  1.,  0.,  0.,  1.,  1.,  1.],
          [ 1.,  1.,  0.,  0.,  0.,  0.,  1.,  1.,      1.,  1.,  1.,  0.,  0.,  1.,  1.,  1.],
@@ -104,6 +105,9 @@ class MyPanel(wx.Panel):
         self.timer = wx.Timer(self, wx.ID_ANY)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
         self.SetBackgroundColour("black")  
+        
+        pygame.init()
+        self.path = '/home/jonathan/code/BB8_face/Audio/'
     
         self.color = 0
         self.exp = 0
@@ -112,7 +116,7 @@ class MyPanel(wx.Panel):
         self.db_id = 0
         self.text = ''     
         
-        self.timer.Start(4000 + random.random() * 6000)
+        self.timer.Start(4000 + random.random() * 600)
         
     def OnTimer(self, event):
         """ OnTimer event which is run at a random interval, which runs OnPaint method. """
@@ -130,14 +134,20 @@ class MyPanel(wx.Panel):
             
         if self.db_id <= len(name_ls)-1:
             self.text = name_ls[self.db_id]
-            print(self.text)
-#             self.Bind(self.EVT_WRITE, self.OnWrite)
             self.Bind(wx.EVT_PAINT, self.OnWrite)
-            self.db_id = self.db_id + 1
-        else:                
+            self.db_id += 1
+        else:
             self.exp = self.expList[random.randint(0, len(self.expList)-1)]
             self.color = (random.randint(0, 255),random.randint(0, 255),random.randint(0, 255))
             self.Bind(wx.EVT_PAINT, self.OnPaint)
+        
+        if random.randint(1,5) == 1:
+            file = str(random.randint(1, 57))
+            formatType = '.wav'
+            filename = self.path + file + formatType
+            s = pygame.mixer.Sound(filename)
+            s.play()
+        
         self.Refresh()
 
     def onKey(self, event):
