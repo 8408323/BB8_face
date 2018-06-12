@@ -5,8 +5,6 @@ import numpy as np
 import random
 import time
 import pygame
-import pymysql
-pymysql.install_as_MySQLdb()
 import MySQLdb
 
 
@@ -36,7 +34,7 @@ def expressions(expr):
     elif expr == 'left':
         expr_1 = np.array(
         [[ 0.,  0.,  1.,  1.,  1.,  1.,  0.,  0.,      0.,  0.,  1.,  1.,  1.,  1.,  0.,  0.],
-         [ 0.,  1.,  1.,  1.,  1.,  1.,  1.,  0.,      0.,  1.,  1.,  1.,  1.,  1.,  1.,  1.],
+         [ 0.,  1.,  1.,  1.,  1.,  1.,  1.,  0.,      0.,  1.,  1.,  1.,  1.,  1.,  1.,  0.],
          [ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,      1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.],
          [ 1.,  1.,  1.,  1.,  1.,  0.,  0.,  1.,      1.,  1.,  1.,  1.,  1.,  0.,  0.,  1.],
          [ 1.,  1.,  1.,  1.,  1.,  0.,  0.,  1.,      1.,  1.,  1.,  1.,  1.,  0.,  0.,  1.],
@@ -46,7 +44,7 @@ def expressions(expr):
     elif expr == 'right':
         expr_1 = np.array(
         [[ 0.,  0.,  1.,  1.,  1.,  1.,  0.,  0.,      0.,  0.,  1.,  1.,  1.,  1.,  0.,  0.],
-         [ 0.,  1.,  1.,  1.,  1.,  1.,  1.,  0.,      0.,  1.,  1.,  1.,  1.,  1.,  1.,  1.],
+         [ 0.,  1.,  1.,  1.,  1.,  1.,  1.,  0.,      0.,  1.,  1.,  1.,  1.,  1.,  1.,  0.],
          [ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,      1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.],
          [ 1.,  0.,  0.,  1.,  1.,  1.,  1.,  1.,      1.,  0.,  0.,  1.,  1.,  1.,  1.,  1.],
          [ 1.,  0.,  0.,  1.,  1.,  1.,  1.,  1.,      1.,  0.,  0.,  1.,  1.,  1.,  1.,  1.],
@@ -101,13 +99,14 @@ class MyPanel(wx.Panel):
     def __init__(self, parent):
         """Constructor"""
         wx.Panel.__init__(self, parent)
-        self.Bind(wx.EVT_KEY_DOWN, self.onKey)
+        self.Bind(wx.EVT_KEY_DOWN, self.OnKey)
         self.timer = wx.Timer(self, wx.ID_ANY)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
         self.SetBackgroundColour("black")  
         
         pygame.init()
         self.path = '/home/jonathan/code/BB8_face/Audio/'
+        self.formatType = '.wav'
     
         self.color = 0
         self.exp = 0
@@ -116,26 +115,37 @@ class MyPanel(wx.Panel):
         self.db_id = 0
         self.text = ''     
         
-        self.timer.Start(4000 + random.random() * 6000)
+        self.timer.Start(4000 + random.random() * 600)
         
     def OnTimer(self, event):
         """ OnTimer event which is run at a random interval, which runs OnPaint method. """
         
-        self.db = MySQLdb.connect(host="192.168.10.10",
+        self.db = MySQLdb.connect(
+                             host="192.168.10.10",
                              user="homestead",
                              passwd="secret",
-                             db="laravel_exjobb")
+                             db="laravel_exjobb",
+                             ssl={"ssl-ca": '/device.crt'})
+        
         self.cur = self.db.cursor()
         self.cur.execute("SELECT * FROM registration")
         
         name_ls = []
+        lastID = 1
         for row in self.cur.fetchall():
             name_ls.append(row[1])
+            lastID = row[0]
+            
+        if lastID > 1 and self.db_id == 0:
+            self.db_id = lastID
             
         if self.db_id <= len(name_ls)-1:
             self.text = name_ls[self.db_id]
             self.Bind(wx.EVT_PAINT, self.OnWrite)
             self.db_id += 1
+            file = str(random.randint(1, 57))
+            filename = self.path + file + self.formatType
+            pygame.mixer.Sound(filename).play()
         else:
             self.exp = self.expList[random.randint(0, len(self.expList)-1)]
             self.color = (random.randint(0, 255),random.randint(0, 255),random.randint(0, 255))
@@ -143,14 +153,12 @@ class MyPanel(wx.Panel):
         
         if random.randint(1,4) == 1:
             file = str(random.randint(1, 57))
-            formatType = '.wav'
-            filename = self.path + file + formatType
-            s = pygame.mixer.Sound(filename)
-            s.play()
+            filename = self.path + file + self.formatType
+            pygame.mixer.Sound(filename).play()
         
         self.Refresh()
 
-    def onKey(self, event):
+    def OnKey(self, event):
         """ Check for ESC key press and exit if ESC is pressed """
         key_code = event.GetKeyCode()
         if key_code == wx.WXK_ESCAPE:
