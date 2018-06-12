@@ -5,8 +5,12 @@ import numpy as np
 import random
 import time
 import pygame
-import MySQLdb
+import requests
 
+URL_login = 'http://192.168.10.10/login'
+URL_dump = 'http://192.168.10.10/dump'
+
+login_data = dict(email='admin@syntronic.se', password='password')
 
 coords =  np.zeros((2,8,16))
 for x in range(0,8):
@@ -120,27 +124,25 @@ class MyPanel(wx.Panel):
     def OnTimer(self, event):
         """ OnTimer event which is run at a random interval, which runs OnPaint method. """
         
-        self.db = MySQLdb.connect(
-                             host="192.168.10.10",
-                             user="homestead",
-                             passwd="secret",
-                             db="laravel_exjobb",
-                             ssl={"ssl-ca": '/device.crt'})
-        
-        self.cur = self.db.cursor()
-        self.cur.execute("SELECT * FROM registration")
-        
-        name_ls = []
+        s = requests.session()
+        s.post(URL_login, login_data)
+        data = s.get(URL_dump)
+
+        toArray = data.text
+        array = toArray.split(',')
+        array_name = []
         lastID = 1
-        for row in self.cur.fetchall():
-            name_ls.append(row[1])
-            lastID = row[0]
-            
+        for i in range(len(array)):
+            if i%2:
+                array_name.append(array[i])
+            else:
+                lastID = int(array[i])
+                
         if lastID > 1 and self.db_id == 0:
             self.db_id = lastID
             
-        if self.db_id <= len(name_ls)-1:
-            self.text = name_ls[self.db_id]
+        if self.db_id <= len(array_name)-1:
+            self.text = array_name[self.db_id]
             self.Bind(wx.EVT_PAINT, self.OnWrite)
             self.db_id += 1
             file = str(random.randint(1, 57))
