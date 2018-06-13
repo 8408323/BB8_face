@@ -119,7 +119,7 @@ class MyPanel(wx.Panel):
         self.db_id = 0
         self.text = ''     
         
-        self.timer.Start(4000 + random.random() * 600)
+        self.timer.Start(4000 + random.random() * 6000)
         
     def OnTimer(self, event):
         """ OnTimer event which is run at a random interval, which runs OnPaint method. """
@@ -145,18 +145,17 @@ class MyPanel(wx.Panel):
             self.text = array_name[self.db_id]
             self.Bind(wx.EVT_PAINT, self.OnWrite)
             self.db_id += 1
-            file = str(random.randint(1, 57))
-            filename = self.path + file + self.formatType
-            pygame.mixer.Sound(filename).play()
+            filename = self.path + '0' + self.formatType
+            pygame.mixer.Sound(filename).play().set_volume(1.0)
         else:
             self.exp = self.expList[random.randint(0, len(self.expList)-1)]
             self.color = (random.randint(0, 255),random.randint(0, 255),random.randint(0, 255))
             self.Bind(wx.EVT_PAINT, self.OnPaint)
         
-        if random.randint(1,4) == 1:
+        if random.randint(1,3) == 1:
             file = str(random.randint(1, 57))
             filename = self.path + file + self.formatType
-            pygame.mixer.Sound(filename).play()
+            pygame.mixer.Sound(filename).play().set_volume(1.0)
         
         self.Refresh()
 
