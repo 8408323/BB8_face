@@ -183,10 +183,23 @@ class MyPanel(wx.Panel):
         dc = wx.PaintDC(self)
         gc = wx.GraphicsContext.Create(dc)
         fontStyle = wx.Font(wx.FontInfo(32).Family(wx.FONTFAMILY_MODERN))
+        fontStyleL = wx.Font(wx.FontInfo(48).Family(wx.FONTFAMILY_MODERN))
         fontColour = wx.WHITE
         font = gc.CreateFont(fontStyle, fontColour)
         gc.SetFont(font)
+        text1 = 'Thank you'
+        text2 = 'for applying!'
+        tw1, th1 = gc.GetTextExtent(text1)
+        tw2, th2 = gc.GetTextExtent(text2)
+        font = gc.CreateFont(fontStyleL, fontColour)
+        gc.SetFont(font)
         tw, th = gc.GetTextExtent(self.text)
+        font = gc.CreateFont(fontStyle, fontColour)
+        gc.SetFont(font)
+        gc.DrawText(text1, 400-tw1/2, 240-th/2-th1)
+        gc.DrawText(text2, 400-tw2/2, 240-th/2+3/2*th2)
+        font = gc.CreateFont(fontStyleL, fontColour)
+        gc.SetFont(font)
         gc.DrawText(self.text, 400-tw/2, 240-th/2)
     
 class MyFrame(wx.Frame):
