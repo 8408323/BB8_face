@@ -7,10 +7,10 @@ import time
 import pygame
 import requests
 
-URL_login = 'http://192.168.10.10/login'
-URL_dump = 'http://192.168.10.10/dump'
+URL_login = 'https://adrahil.syntronic.com:9443/login'
+URL_dump = 'https://adrahil.syntronic.com:9443/dump'
 
-login_data = dict(email='admin@syntronic.se', password='password')
+login_data = dict(email='admin@syntronic.se', password='Syntronic1984')
 
 coords =  np.zeros((2,8,16))
 for x in range(0,8):
@@ -132,11 +132,12 @@ class MyPanel(wx.Panel):
         array = toArray.split(',')
         array_name = []
         lastID = 1
-        for i in range(len(array)):
-            if i%2:
-                array_name.append(array[i])
-            else:
-                lastID = int(array[i])
+        if array != ['']:
+            for i in range(len(array)):
+                if i%2:
+                    array_name.append(array[i])
+                else:
+                    lastID = int(array[i])
                 
         if lastID > 1 and self.db_id == 0:
             self.db_id = lastID
